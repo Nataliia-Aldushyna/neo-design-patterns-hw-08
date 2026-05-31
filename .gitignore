@@ -1,0 +1,5 @@
+node_modules/
+dist/
+# output.md
+# output.html
+# output.txt

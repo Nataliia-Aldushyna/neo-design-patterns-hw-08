@@ -1,0 +1,26 @@
+{
+  "name": "composite-bridge-document",
+  "version": "1.0.0",
+  "description": "Document generation system using Composite and Bridge patterns",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "start": "ts-node src/main.ts",
+    "clean": "rimraf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nataliia-Aldushyna/neo-design-patterns-hw-07.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3",
+    "rimraf": "^5.0.0"
+  }
+}
