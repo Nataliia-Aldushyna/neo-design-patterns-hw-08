@@ -1,241 +1,176 @@
-# 📄 Document Generator System (TypeScript)
+# 🔄 Reactive Document Rendering System (TypeScript)
+### Домашнє завдання до Теми Поведінковий патерн Спостерігач — Observer Pattern
 
-## Домашнє завдання до теми: Структурні патерни — Composite та Bridge
+## 🎯 Мета роботи
+
+Розширити генератор документів із попереднього домашнього завдання, додавши реактивний механізм відстеження процесу рендерингу за допомогою поведінкового патерну **Observer (Спостерігач)**.
+
+Під час генерації кожен елемент документа (`Paragraph`, `List`, `Section`) надсилає подію про завершення рендерингу, а підписники реагують на ці події незалежно від основної логіки застосунку.
 
 ---
 
-## 📌 Опис завдання
+## 🏗️ Реалізована функціональність
 
-У цьому домашньому завданні було реалізовано систему генерації документів, яка дозволяє створювати складні документи з вкладеною структурою та виводити їх у різних форматах.
-
-Система підтримує:
-
-- Paragraph (Параграф)
-- List (Список)
-- Section (Секція)
-
-Документ може бути згенерований у форматах:
+✅ Рендеринг документа у форматах:
 
 - Markdown
 - HTML
 - Plain Text
 
-Основною метою роботи було:
+✅ Відправка подій після завершення рендерингу кожного елемента
 
-- навчитися працювати з деревоподібними структурами об'єктів;
-- відокремити структуру документа від способу його відображення;
-- реалізувати структурні патерни Composite та Bridge;
-- забезпечити легке розширення системи новими форматами виводу.
+✅ Логування процесу рендерингу
 
----
+✅ Підрахунок кількості секцій, параграфів та списків
 
-## 🎯 Мета роботи
+✅ Вимірювання загального часу генерації документа
 
-Реалізувати систему генерації документів, яка:
-
-- підтримує вкладені секції;
-- працює через єдиний інтерфейс елементів документа;
-- дозволяє змінювати формат виводу без зміни структури документа;
-- підтримує експорт у Markdown, HTML та Plain Text;
-- використовує фабрику для створення рендерерів.
-
----
-
-## 🏗 Реалізована функціональність
-
-Система підтримує:
-
-- створення параграфів;
-- створення списків;
-- створення вкладених секцій;
-- формування документа у вигляді дерева;
-- генерацію Markdown-документів;
-- генерацію HTML-документів;
-- генерацію Plain Text документів;
-- збереження результату у файл;
-- виведення результату в консоль;
-- вибір формату через CLI-аргументи.
+✅ Можливість легко додавати нових підписників без зміни існуючого коду
 
 ---
 
 ## 🧠 Застосовані патерни
 
-### ✔ Composite (Компонувальник)
+### 🔄 Observer (Спостерігач)
 
-Патерн Composite реалізовано у класі `Section`.
+Реалізовано систему підписки на події рендерингу:
 
-Клас `Section`:
-
-- реалізує інтерфейс `DocNode`;
-- може містити інші елементи документа;
-- може містити інші секції;
-- дозволяє будувати деревоподібну структуру документа.
-
-Схема роботи:
-
-```txt
-Section
-├── Paragraph
-├── List
-└── Section
-    ├── Paragraph
-    └── List
-```
-
-Метод `render()` рекурсивно викликає `render()` для всіх дочірніх елементів.
+- **RenderEventPublisher** — видавець подій;
+- **RenderEventSubscriber** — інтерфейс підписників;
+- **RenderLoggerSubscriber** — логування рендерингу;
+- **SummaryCollector** — збір статистики;
+- **PerformanceSubscriber** — підрахунок часу рендерингу.
 
 ---
 
-### ✔ Bridge (Міст)
+## 🔄 Реалізація Observer
 
-Патерн Bridge реалізовано через інтерфейс `DocRenderer`.
+Кожен елемент документа після завершення рендерингу викликає:
 
-Елементи документа:
-
-- Paragraph
-- List
-- Section
-
-не знають нічого про HTML, Markdown чи Plain Text.
-
-Вони делегують форматування об'єкту рендерера:
-
-```txt
-Paragraph
-     ↓
-DocRenderer
-     ↓
-HTMLRenderer
-MarkdownRenderer
-PlainTextRenderer
+```ts
+RenderEventPublisher.notify(context);
 ```
 
-Завдяки цьому структуру документа можна залишати незмінною, змінюючи лише рендерер.
+`RenderEventPublisher` зберігає список підписників та повідомляє їх про подію.
+
+Події передаються через об'єкт:
+
+```ts
+export interface RenderContext {
+  type: "Section" | "Paragraph" | "List";
+  content: string;
+  level?: number;
+  items?: string[];
+  renderTime?: number;
+}
+```
 
 ---
 
-### ✔ Factory Method
+## 🚀 Приклади запуску
 
-Для створення рендерерів використовується клас `RendererFactory`.
-
-Фабрика відповідає за вибір між:
-
-- HTMLRenderer
-- MarkdownRenderer
-- PlainTextRenderer
-
-та повертає MarkdownRenderer за замовчуванням.
-
----
-
-## 🚀 Як запустити проєкт
-
-Встановити залежності:
-
-```bash
-npm install
-```
-
-Запустити Markdown-вивід:
-
-```bash
-npx ts-node src/main.ts markdown
-```
-
-Створити Markdown-файл:
+### 📝 Markdown
 
 ```bash
 npx ts-node src/main.ts markdown output.md
 ```
 
-Створити HTML-файл:
+### 🌐 HTML
 
 ```bash
 npx ts-node src/main.ts html output.html
 ```
 
-Створити Plain Text файл:
+### 📄 Plain Text
 
 ```bash
 npx ts-node src/main.ts plain output.txt
 ```
 
----
+### 💻 Вивід у консоль
 
-## ▶️ Приклад виконання
-
-### Markdown
-
-```txt
-# Структурні патерни
-
-## Основні патерни
-
-Розглянемо два важливих структурних патерни.
-
-## Composite
-
-Дозволяє створювати деревоподібні структури об'єктів.
-
-- Спрощує структуру
-- Гнучкий код
-- Легка підтримка
-
-## Bridge
-
-Розділяє абстракцію та реалізацію.
-
-- Незалежні зміни
-- Краща масштабованість
+```bash
+npx ts-node src/main.ts markdown
 ```
 
 ---
 
-### HTML
+## 📋 Приклад роботи
 
-```html
-<h1>Структурні патерни</h1>
+```text
+[Log] Rendered Paragraph (44 chars)
+[Log] Rendered Paragraph (53 chars)
+[Log] Rendered List (3 items)
+[Log] Rendered Section ("Composite", level 2)
+[Log] Rendered Paragraph (34 chars)
+[Log] Rendered List (2 items)
+[Log] Rendered Section ("Bridge", level 2)
+[Log] Rendered Section ("Основні патерни", level 2)
+[Log] Rendered Section ("Структурні патерни", level 1)
 
-<h2>Основні патерни</h2>
+[Summary] Rendered 4 sections, 3 paragraphs, 2 lists
 
-<p>Розглянемо два важливих структурних патерни.</p>
+[Performance] Total render time: 2ms
 ```
 
 ---
 
-### Plain Text
+## ➕ Приклад нового підписника
 
-```txt
-СТРУКТУРНІ ПАТЕРНИ
+Для додавання нового Observer достатньо реалізувати інтерфейс:
 
-ОСНОВНІ ПАТЕРНИ
+```ts
+export class CustomSubscriber implements RenderEventSubscriber {
+  update(context: RenderContext): void {
+    console.log("New event:", context.type);
+  }
+}
+```
 
-Розглянемо два важливих структурних патерни.
+та зареєструвати його:
+
+```ts
+RenderEventPublisher.subscribe(new CustomSubscriber());
 ```
 
 ---
+
+## ✅ Результат
+
+У результаті роботи створено реактивну систему генерації документів, яка поєднує:
+
+- Composite та Bridge з попереднього домашнього завдання;
+- Observer для відстеження подій рендерингу;
+- логування, статистику та моніторинг продуктивності без зміни логіки елементів документа.
+
+---
+
+У ході виконання роботи було реалізовано патерн **Observer**, який забезпечує слабкий зв'язок між компонентами системи та дозволяє легко розширювати функціональність застосунку новими підписниками без модифікації існуючого коду.
 
 ## 📁 Структура проєкту
 
-```txt
+```text
 src/
+├── main.ts
+├── RenderEventPublisher.ts
 ├── interfaces/
+│   ├── RenderEventSubscriber.ts
+│   ├── RenderContext.ts
 │   ├── DocNode.ts
 │   └── DocRenderer.ts
-│
-├── renderers/
-│   ├── BaseRenderer.ts
-│   ├── HTMLRenderer.ts
-│   ├── MarkdownRenderer.ts
-│   └── PlainTextRenderer.ts
-│
+├── subscribers/
+│   ├── RenderLoggerSubscriber.ts
+│   ├── SummaryCollector.ts
+│   └── PerformanceSubscriber.ts
 ├── nodes/
+│   ├── Section.ts
 │   ├── Paragraph.ts
-│   ├── List.ts
-│   └── Section.ts
-│
+│   └── List.ts
 ├── factories/
 │   └── RendererFactory.ts
-│
-└── main.ts
+└── renderers/
+    ├── HTMLRenderer.ts
+    ├── MarkdownRenderer.ts
+    ├── PlainTextRenderer.ts
+    └── BaseRenderer.ts
 ```
